@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import bcrypt from 'bcrypt'
+import bcrypt from 'bcryptjs'
 import dbConnect from '@/lib/mongodb'
 import UserModel from '@/lib/models/User'
 
