@@ -16,12 +16,10 @@ export async function GET(req: NextRequest) {
 
     const { searchParams } = new URL(req.url)
     const status = searchParams.get('status')
-    const assignee = searchParams.get('assignee')
 
     // 필터 조건
     const filter: any = {}
     if (status) filter.status = status
-    if (assignee) filter.assignee = assignee
 
     const tasks = await TaskModel.find(filter)
       .sort({ createdAt: -1 })
@@ -42,11 +40,11 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: '인증이 필요합니다' }, { status: 401 })
     }
 
-    const { title, description, assignee, priority, dueDate } = await req.json()
+    const { title, description, url, attachments, dueDate } = await req.json()
 
-    if (!title || !assignee) {
+    if (!title) {
       return NextResponse.json(
-        { error: '제목과 담당자는 필수입니다' },
+        { error: '제목은 필수입니다' },
         { status: 400 }
       )
     }
@@ -56,10 +54,9 @@ export async function POST(req: NextRequest) {
     const task = await TaskModel.create({
       title,
       description: description || '',
-      assignee,
-      requester: session.user.id,
-      priority: priority || 'medium',
-      status: 'requested',
+      url: url || '',
+      attachments: attachments || [],
+      status: 'preparing',
       dueDate: dueDate ? new Date(dueDate) : undefined,
       comments: [],
     })

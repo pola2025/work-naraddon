@@ -72,8 +72,8 @@ export async function DELETE(req: NextRequest, { params }: { params: { id: strin
       return NextResponse.json({ error: '업무를 찾을 수 없습니다' }, { status: 404 })
     }
 
-    // 요청자 또는 관리자만 삭제 가능
-    if (task.requester !== session.user.id && session.user.role !== 'admin') {
+    // 관리자만 삭제 가능
+    if (session.user.role !== 'admin') {
       return NextResponse.json({ error: '삭제 권한이 없습니다' }, { status: 403 })
     }
 

@@ -27,9 +27,6 @@
 }
 
 @layer base {
-  * {
-    @apply border-border;
-  }
   body {
     @apply bg-neutral-50 text-neutral-900;
     font-family: 'Pretendard', -apple-system, system-ui, sans-serif;

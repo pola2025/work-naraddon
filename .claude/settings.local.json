@@ -5,7 +5,28 @@
       "Bash(git add:*)",
       "Bash(git commit:*)"
     ],
-    "deny": [],
-    "ask": []
+    "deny": [
+      "Bash(taskkill:*)",
+      "Bash(kill:*)"
+    ],
+    "ask": [
+      "Bash(npm run dev:*)",
+      "Bash(npm start:*)",
+      "Bash(yarn dev:*)",
+      "Bash(pnpm dev:*)"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "prompt",
+            "prompt": "개발서버 관련 명령어(npm run dev, taskkill, kill, netstat :3000~3999)를 실행하려고 합니다.\n\n$ARGUMENTS\n\n다음을 확인하세요:\n1. PowerShell을 사용해야 하는 명령어인가요? (taskkill, Stop-Process 등)\n2. 개발서버 시작 전에 포트를 확인했나요?\n3. 올바른 순서로 진행하고 있나요? (포트 확인 → 프로세스 종료 → 서버 시작)\n\n위반 시 dev-server Skill을 사용하세요."
+          }
+        ]
+      }
+    ]
   }
 }

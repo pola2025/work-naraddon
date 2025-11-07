@@ -2,7 +2,7 @@ interface StatsWidgetProps {
   title: string
   value: number
   subtitle: string
-  color: 'blue' | 'purple' | 'red' | 'green'
+  color: 'blue' | 'purple' | 'red' | 'green' | 'yellow'
 }
 
 export function StatsWidget({ title, value, subtitle, color }: StatsWidgetProps) {
@@ -11,6 +11,7 @@ export function StatsWidget({ title, value, subtitle, color }: StatsWidgetProps)
     purple: 'bg-purple-50 text-purple-600',
     red: 'bg-red-50 text-red-600',
     green: 'bg-green-50 text-green-600',
+    yellow: 'bg-yellow-50 text-yellow-600',
   }
 
   return (

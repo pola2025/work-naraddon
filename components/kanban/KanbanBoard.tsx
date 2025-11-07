@@ -2,45 +2,32 @@
 
 import { useState, useEffect } from 'react'
 import { Task } from '@/types'
-import {
-  DndContext,
-  DragEndEvent,
-  DragOverlay,
-  DragStartEvent,
-  PointerSensor,
-  useSensor,
-  useSensors,
-} from '@dnd-kit/core'
-import { KanbanColumn } from './KanbanColumn'
-import { TaskCard } from './TaskCard'
 import { Button } from '@/components/ui/Button'
-import { HiPlus } from 'react-icons/hi'
+import { HiPlus, HiOutlineClock, HiOutlineLink } from 'react-icons/hi'
 import { Spinner } from '@/components/ui/Spinner'
+import { format } from 'date-fns'
 
 interface KanbanBoardProps {
   onTaskClick: (task: Task) => void
   onCreateTask: () => void
+  isAdmin: boolean
 }
 
-const columns = [
-  { id: 'requested', title: '요청' },
-  { id: 'in_progress', title: '진행중' },
-  { id: 'review', title: '검토' },
-  { id: 'completed', title: '완료' },
-]
+const statusLabels = {
+  preparing: '준비중',
+  in_progress: '진행중',
+  completed: '진행완료',
+}
 
-export function KanbanBoard({ onTaskClick, onCreateTask }: KanbanBoardProps) {
+const statusColors = {
+  preparing: 'bg-yellow-100 text-yellow-800',
+  in_progress: 'bg-blue-100 text-blue-800',
+  completed: 'bg-green-100 text-green-800',
+}
+
+export function KanbanBoard({ onTaskClick, onCreateTask, isAdmin }: KanbanBoardProps) {
   const [tasks, setTasks] = useState<Task[]>([])
   const [isLoading, setIsLoading] = useState(true)
-  const [activeTask, setActiveTask] = useState<Task | null>(null)
-
-  const sensors = useSensors(
-    useSensor(PointerSensor, {
-      activationConstraint: {
-        distance: 8,
-      },
-    })
-  )
 
   // 업무 목록 불러오기
   const fetchTasks = async () => {
@@ -61,34 +48,11 @@ export function KanbanBoard({ onTaskClick, onCreateTask }: KanbanBoardProps) {
     fetchTasks()
   }, [])
 
-  // 드래그 시작
-  const handleDragStart = (event: DragStartEvent) => {
-    const task = tasks.find(t => t._id === event.active.id)
-    setActiveTask(task || null)
-  }
-
-  // 드래그 종료 (상태 변경)
-  const handleDragEnd = async (event: DragEndEvent) => {
-    const { active, over } = event
-
-    if (!over) {
-      setActiveTask(null)
-      return
-    }
-
-    const taskId = active.id as string
-    const newStatus = over.id as string
-
-    // 상태가 변경되지 않았으면 무시
-    const task = tasks.find(t => t._id === taskId)
-    if (!task || task.status === newStatus) {
-      setActiveTask(null)
-      return
-    }
-
-    // 낙관적 업데이트 (UI 즉시 반영)
+  // 상태 변경
+  const handleStatusChange = async (taskId: string, newStatus: Task['status']) => {
+    // 낙관적 업데이트
     setTasks(prev =>
-      prev.map(t => (t._id === taskId ? { ...t, status: newStatus as Task['status'] } : t))
+      prev.map(t => (t._id === taskId ? { ...t, status: newStatus } : t))
     )
 
     // API 호출
@@ -107,15 +71,7 @@ export function KanbanBoard({ onTaskClick, onCreateTask }: KanbanBoardProps) {
       console.error('Failed to update task:', error)
       fetchTasks()
     }
-
-    setActiveTask(null)
   }
-
-  // 상태별로 업무 그룹화
-  const tasksByStatus = columns.reduce((acc, column) => {
-    acc[column.id] = tasks.filter(task => task.status === column.id)
-    return acc
-  }, {} as Record<string, Task[]>)
 
   if (isLoading) {
     return (
@@ -131,37 +87,120 @@ export function KanbanBoard({ onTaskClick, onCreateTask }: KanbanBoardProps) {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold text-neutral-900">업무 관리</h2>
-          <p className="text-neutral-600 mt-1">드래그하여 상태를 변경하세요</p>
+          <p className="text-neutral-600 mt-1">
+            {isAdmin ? '업무 목록을 관리하고 상태를 변경하세요' : '업무 목록을 확인하세요'}
+          </p>
         </div>
-        <Button onClick={onCreateTask}>
-          <HiPlus className="w-5 h-5 mr-2" />
-          새 업무
-        </Button>
+        {isAdmin && (
+          <Button onClick={onCreateTask}>
+            <HiPlus className="w-5 h-5 mr-2" />
+            새 업무
+          </Button>
+        )}
       </div>
 
-      {/* 칸반 보드 */}
-      <DndContext
-        sensors={sensors}
-        onDragStart={handleDragStart}
-        onDragEnd={handleDragEnd}
-      >
-        <div className="flex gap-4 overflow-x-auto pb-4">
-          {columns.map(column => (
-            <KanbanColumn
-              key={column.id}
-              id={column.id}
-              title={column.title}
-              tasks={tasksByStatus[column.id] || []}
-              onTaskClick={onTaskClick}
-            />
-          ))}
+      {/* 업무 목록 */}
+      {tasks.length === 0 ? (
+        <div className="text-center py-12 bg-neutral-50 rounded-lg">
+          <p className="text-neutral-600 mb-4">등록된 업무가 없습니다</p>
+          {isAdmin && (
+            <Button onClick={onCreateTask}>
+              <HiPlus className="w-5 h-5 mr-2" />
+              첫 업무 만들기
+            </Button>
+          )}
         </div>
+      ) : (
+        <div className="bg-white rounded-lg border border-neutral-200 overflow-hidden">
+          {/* 테이블 헤더 */}
+          <div className="grid grid-cols-12 gap-4 px-6 py-3 bg-neutral-50 border-b border-neutral-200 font-medium text-sm text-neutral-700">
+            <div className="col-span-4">업무 제목</div>
+            <div className="col-span-2">상태</div>
+            <div className="col-span-2">마감일</div>
+            <div className="col-span-3">URL</div>
+            <div className="col-span-1 text-center">댓글</div>
+          </div>
 
-        {/* 드래그 오버레이 */}
-        <DragOverlay>
-          {activeTask ? <TaskCard task={activeTask} onClick={() => {}} /> : null}
-        </DragOverlay>
-      </DndContext>
+          {/* 업무 목록 */}
+          <div className="divide-y divide-neutral-200">
+            {tasks.map(task => (
+              <div
+                key={task._id}
+                className="grid grid-cols-12 gap-4 px-6 py-4 hover:bg-neutral-50 transition-colors cursor-pointer"
+                onClick={() => onTaskClick(task)}
+              >
+                {/* 제목 */}
+                <div className="col-span-4">
+                  <h3 className="font-medium text-neutral-900 mb-1 line-clamp-1">{task.title}</h3>
+                  {task.description && (
+                    <p className="text-sm text-neutral-600 line-clamp-1">{task.description}</p>
+                  )}
+                </div>
+
+                {/* 상태 */}
+                <div className="col-span-2 flex items-center">
+                  {isAdmin ? (
+                    <select
+                      value={task.status}
+                      onChange={e => {
+                        e.stopPropagation()
+                        handleStatusChange(task._id, e.target.value as Task['status'])
+                      }}
+                      onClick={e => e.stopPropagation()}
+                      className={`px-3 py-1 rounded-full text-sm font-medium border-0 cursor-pointer ${statusColors[task.status]}`}
+                    >
+                      <option value="preparing">준비중</option>
+                      <option value="in_progress">진행중</option>
+                      <option value="completed">진행완료</option>
+                    </select>
+                  ) : (
+                    <span className={`px-3 py-1 rounded-full text-sm font-medium ${statusColors[task.status]}`}>
+                      {statusLabels[task.status]}
+                    </span>
+                  )}
+                </div>
+
+                {/* 마감일 */}
+                <div className="col-span-2 flex items-center text-sm text-neutral-600">
+                  {task.dueDate ? (
+                    <div className="flex items-center gap-1">
+                      <HiOutlineClock className="w-4 h-4" />
+                      <span>{format(new Date(task.dueDate), 'yyyy-MM-dd')}</span>
+                    </div>
+                  ) : (
+                    <span className="text-neutral-400">-</span>
+                  )}
+                </div>
+
+                {/* URL */}
+                <div className="col-span-3 flex items-center text-sm">
+                  {task.url ? (
+                    <a
+                      href={task.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={e => e.stopPropagation()}
+                      className="flex items-center gap-1 text-blue-600 hover:underline truncate"
+                    >
+                      <HiOutlineLink className="w-4 h-4 flex-shrink-0" />
+                      <span className="truncate">{task.url}</span>
+                    </a>
+                  ) : (
+                    <span className="text-neutral-400">-</span>
+                  )}
+                </div>
+
+                {/* 댓글 수 */}
+                <div className="col-span-1 flex items-center justify-center">
+                  <span className="text-sm text-neutral-600">
+                    {task.comments.length > 0 ? task.comments.length : '-'}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   )
 }

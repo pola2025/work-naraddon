@@ -41,6 +41,18 @@ const BlogPostSchema = new Schema<BlogPost>(
       type: String,
       required: true,
     },
+    authorId: {
+      type: String,
+      required: false,
+    },
+    monthKey: {
+      type: String,
+      required: false,
+    },
+    serialNumber: {
+      type: Number,
+      required: false,
+    },
   },
   {
     timestamps: true,
@@ -50,8 +62,9 @@ const BlogPostSchema = new Schema<BlogPost>(
 
 // 인덱스
 BlogPostSchema.index({ keyword: 1 })
-BlogPostSchema.index({ author: 1 })
+BlogPostSchema.index({ authorId: 1 })
 BlogPostSchema.index({ createdAt: -1 })
+BlogPostSchema.index({ monthKey: 1, authorId: 1, serialNumber: 1 }, { unique: true })
 
 const BlogPostModel: Model<BlogPost> =
   mongoose.models.WorkBlogPost || mongoose.model<BlogPost>('WorkBlogPost', BlogPostSchema)

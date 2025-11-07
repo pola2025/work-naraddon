@@ -32,3 +32,12 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Windows nul file
+nul
+
+# Google OAuth credentials
+client_secret_*.json
+
+# Claude settings
+.claude/settings.local.json

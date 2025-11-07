@@ -14,14 +14,23 @@ export interface Task {
   _id: string
   title: string
   description: string
-  status: 'requested' | 'in_progress' | 'review' | 'completed'
-  priority: 'low' | 'medium' | 'high' | 'urgent'
-  assignee: string // user _id
-  requester: string // user _id
+  status: 'preparing' | 'in_progress' | 'completed'
+  url?: string
+  attachments?: Attachment[]
   dueDate?: Date
   comments: Comment[]
   createdAt: Date
   updatedAt: Date
+}
+
+// 첨부파일
+export interface Attachment {
+  _id?: string
+  filename: string
+  url: string
+  size: number
+  mimeType: string
+  uploadedAt: Date
 }
 
 // 댓글
@@ -53,7 +62,10 @@ export interface BlogPost {
   url: string // 포스팅 URL
   keyword: string // 검색 키워드
   rankings: Ranking[] // 순위 기록
-  author: string // user _id
+  author: string // 작성자 이름 (user.name)
+  authorId?: string // user _id
+  monthKey?: string // 월별 구분 (예: 2025-01)
+  serialNumber?: number // 월별 일련번호 (예: 1, 2, 3...)
   createdAt: Date
   updatedAt: Date
 }

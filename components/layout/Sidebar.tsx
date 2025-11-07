@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { useSession } from 'next-auth/react'
 import {
   HiOutlineHome,
   HiOutlineClipboardList,
@@ -10,19 +11,28 @@ import {
 } from 'react-icons/hi'
 
 const navigation = [
-  { name: '대시보드', href: '/dashboard', icon: HiOutlineHome },
-  { name: '업무 관리', href: '/tasks', icon: HiOutlineClipboardList },
-  { name: '운영 계정', href: '/accounts', icon: HiOutlineKey },
-  { name: '블로그 포스팅', href: '/blog-posts', icon: HiOutlineDocumentText },
+  { name: '대시보드', href: '/dashboard', icon: HiOutlineHome, adminOnly: false },
+  { name: '업무 관리', href: '/tasks', icon: HiOutlineClipboardList, adminOnly: false },
+  { name: '운영 계정', href: '/accounts', icon: HiOutlineKey, adminOnly: true },
+  { name: '블로그 포스팅', href: '/blog-posts', icon: HiOutlineDocumentText, adminOnly: false },
 ]
 
 export function Sidebar() {
   const pathname = usePathname()
+  const { data: session } = useSession()
+
+  // 사용자 권한에 따라 메뉴 필터링
+  const filteredNavigation = navigation.filter(item => {
+    if (item.adminOnly) {
+      return session?.user?.role === 'admin'
+    }
+    return true
+  })
 
   return (
     <aside className="w-64 bg-white border-r border-neutral-200 fixed left-0 top-16 bottom-0 overflow-y-auto">
       <nav className="p-4 space-y-2">
-        {navigation.map(item => {
+        {filteredNavigation.map(item => {
           const isActive = pathname === item.href
           return (
             <Link

@@ -5,18 +5,18 @@ import { Modal } from '@/components/ui/Modal'
 import { Input } from '@/components/ui/Input'
 import { Button } from '@/components/ui/Button'
 
-interface CreateTaskModalProps {
+interface CreateBlogPostModalProps {
   isOpen: boolean
   onClose: () => void
   onSuccess: () => void
 }
 
-export function CreateTaskModal({ isOpen, onClose, onSuccess }: CreateTaskModalProps) {
+export function CreateBlogPostModal({ isOpen, onClose, onSuccess }: CreateBlogPostModalProps) {
   const [formData, setFormData] = useState({
     title: '',
-    description: '',
     url: '',
-    dueDate: '',
+    keyword: '',
+    ranking: '',
   })
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
@@ -27,7 +27,7 @@ export function CreateTaskModal({ isOpen, onClose, onSuccess }: CreateTaskModalP
     setIsLoading(true)
 
     try {
-      const response = await fetch('/api/tasks', {
+      const response = await fetch('/api/blog-posts', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
@@ -35,69 +35,74 @@ export function CreateTaskModal({ isOpen, onClose, onSuccess }: CreateTaskModalP
 
       if (!response.ok) {
         const data = await response.json()
-        setError(data.error || '업무 생성 실패')
+        setError(data.error || '블로그 포스팅 등록 실패')
         return
       }
+
+      const data = await response.json()
+      console.log('=== 생성된 포스트 응답 ===')
+      console.log('응답 데이터:', data)
+      console.log('monthKey:', data.post?.monthKey)
+      console.log('serialNumber:', data.post?.serialNumber)
 
       // 성공
       setFormData({
         title: '',
-        description: '',
         url: '',
-        dueDate: '',
+        keyword: '',
+        ranking: '',
       })
       onSuccess()
       onClose()
     } catch (error) {
-      setError('업무 생성 중 오류가 발생했습니다')
+      setError('블로그 포스팅 등록 중 오류가 발생했습니다')
     } finally {
       setIsLoading(false)
     }
   }
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="새 업무 생성" size="md">
+    <Modal isOpen={isOpen} onClose={onClose} title="블로그 포스팅 등록" size="md">
       <form onSubmit={handleSubmit} className="space-y-4">
         <Input
-          label="업무 제목"
+          label="포스팅 제목"
           id="title"
           value={formData.title}
           onChange={e => setFormData({ ...formData, title: e.target.value })}
-          placeholder="업무 제목을 입력하세요"
+          placeholder="블로그 포스팅 제목을 입력하세요"
           required
         />
 
-        <div>
-          <label htmlFor="description" className="block text-sm font-medium text-neutral-700 mb-2">
-            설명
-          </label>
-          <textarea
-            id="description"
-            value={formData.description}
-            onChange={e => setFormData({ ...formData, description: e.target.value })}
-            placeholder="업무에 대한 상세 설명을 입력하세요"
-            rows={4}
-            className="w-full px-3 py-2 border border-neutral-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
-          />
-        </div>
-
         <Input
-          label="URL"
+          label="포스팅 URL"
           id="url"
+          type="text"
           value={formData.url}
           onChange={e => setFormData({ ...formData, url: e.target.value })}
-          placeholder="관련 URL을 입력하세요 (선택사항)"
-          helperText="예: 프로젝트 링크, 문서 링크 등"
+          placeholder="https://..."
+          helperText="블로그 포스팅의 전체 URL을 입력하세요"
+          required
         />
 
         <Input
-          label="마감일"
-          id="dueDate"
-          type="text"
-          value={formData.dueDate}
-          onChange={e => setFormData({ ...formData, dueDate: e.target.value })}
-          placeholder="YYYY-MM-DD"
-          helperText="예: 2025-12-31"
+          label="검색키워드"
+          id="keyword"
+          value={formData.keyword}
+          onChange={e => setFormData({ ...formData, keyword: e.target.value })}
+          placeholder="검색키워드 입력"
+          helperText="모바일 검색 키워드를 작성해주세요."
+          required
+        />
+
+        <Input
+          label="검색순위"
+          id="ranking"
+          type="number"
+          value={formData.ranking}
+          onChange={e => setFormData({ ...formData, ranking: e.target.value })}
+          placeholder="검색순위 입력"
+          helperText="모바일 검색키워드의 검색 순위를 작성해주세요."
+          required
         />
 
         {error && (
@@ -111,7 +116,7 @@ export function CreateTaskModal({ isOpen, onClose, onSuccess }: CreateTaskModalP
             취소
           </Button>
           <Button type="submit" disabled={isLoading}>
-            {isLoading ? '생성 중...' : '생성'}
+            {isLoading ? '등록 중...' : '등록'}
           </Button>
         </div>
       </form>

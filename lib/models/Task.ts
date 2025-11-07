@@ -32,22 +32,25 @@ const TaskSchema = new Schema<Task>(
     },
     status: {
       type: String,
-      enum: ['requested', 'in_progress', 'review', 'completed'],
-      default: 'requested',
+      enum: ['preparing', 'in_progress', 'completed'],
+      default: 'preparing',
     },
-    priority: {
+    url: {
       type: String,
-      enum: ['low', 'medium', 'high', 'urgent'],
-      default: 'medium',
+      default: '',
     },
-    assignee: {
-      type: String,
-      required: true,
-    },
-    requester: {
-      type: String,
-      required: true,
-    },
+    attachments: [
+      {
+        filename: String,
+        url: String,
+        size: Number,
+        mimeType: String,
+        uploadedAt: {
+          type: Date,
+          default: Date.now,
+        },
+      },
+    ],
     dueDate: {
       type: Date,
     },
@@ -61,8 +64,6 @@ const TaskSchema = new Schema<Task>(
 
 // 인덱스
 TaskSchema.index({ status: 1 })
-TaskSchema.index({ assignee: 1 })
-TaskSchema.index({ requester: 1 })
 TaskSchema.index({ dueDate: 1 })
 
 const TaskModel: Model<Task> =

@@ -43,6 +43,10 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-neutral-50">
       <div className="w-full max-w-sm space-y-6">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-neutral-900">나라똔 업무관리시스템</h1>
+        </div>
+
         <form onSubmit={handleSubmit} className="space-y-4">
           <Input
             label="이메일"
