@@ -41,53 +41,46 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-neutral-100">
-      <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle>work.naraddon.com</CardTitle>
-          <p className="text-sm text-neutral-600 mt-2">내부 업무 관리 시스템</p>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <Input
-              label="이메일"
-              id="email"
-              type="email"
-              value={email}
-              onChange={e => setEmail(e.target.value)}
-              placeholder="your@email.com"
-              required
-            />
+    <div className="min-h-screen flex items-center justify-center bg-neutral-50">
+      <div className="w-full max-w-sm space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <Input
+            label="이메일"
+            id="email"
+            type="email"
+            value={email}
+            onChange={e => setEmail(e.target.value)}
+            placeholder="your@email.com"
+            required
+          />
 
-            <Input
-              label="비밀번호"
-              id="password"
-              type="password"
-              value={password}
-              onChange={e => setPassword(e.target.value)}
-              placeholder="••••••"
-              required
-            />
+          <Input
+            label="비밀번호"
+            id="password"
+            type="password"
+            value={password}
+            onChange={e => setPassword(e.target.value)}
+            placeholder="••••••"
+            required
+          />
 
-            {error && (
-              <div className="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-md text-sm">
-                {error}
-              </div>
-            )}
-
-            <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading ? '로그인 중...' : '로그인'}
-            </Button>
-
-            <div className="text-center text-sm text-neutral-600">
-              계정이 없으신가요?{' '}
-              <Link href="/auth/register" className="text-primary hover:underline">
-                회원가입
-              </Link>
+          {error && (
+            <div className="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-md text-sm">
+              {error}
             </div>
-          </form>
-        </CardContent>
-      </Card>
+          )}
+
+          <Button type="submit" className="w-full" disabled={isLoading}>
+            {isLoading ? '로그인 중...' : '로그인'}
+          </Button>
+        </form>
+
+        <div className="text-center text-xs text-neutral-500">
+          <Link href="/auth/register" className="hover:text-neutral-700">
+            계정이 없으신가요?
+          </Link>
+        </div>
+      </div>
     </div>
   )
 }

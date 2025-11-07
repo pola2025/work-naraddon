@@ -58,36 +58,28 @@ export default function RegisterPage() {
 
   if (success) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-neutral-100">
-        <Card className="w-full max-w-md">
-          <CardHeader>
-            <CardTitle>회원가입 완료</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <div className="bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-md">
-                <p className="font-medium">회원가입이 완료되었습니다!</p>
-                <p className="text-sm mt-1">관리자 승인 후 로그인이 가능합니다.</p>
-              </div>
-              <Button className="w-full" onClick={() => router.push('/auth/login')}>
-                로그인 페이지로 이동
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+      <div className="min-h-screen flex items-center justify-center bg-neutral-50">
+        <div className="w-full max-w-sm space-y-6">
+          <div className="bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-md">
+            <p className="font-medium">회원가입이 완료되었습니다!</p>
+            <p className="text-sm mt-1">관리자 승인 후 로그인이 가능합니다.</p>
+          </div>
+          <Button className="w-full" onClick={() => router.push('/auth/login')}>
+            로그인 페이지로 이동
+          </Button>
+        </div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-neutral-100">
-      <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle>회원가입</CardTitle>
-          <p className="text-sm text-neutral-600 mt-2">관리자 승인 후 이용 가능합니다</p>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
+    <div className="min-h-screen flex items-center justify-center bg-neutral-50">
+      <div className="w-full max-w-sm space-y-6">
+        <div className="text-center">
+          <p className="text-xs text-neutral-500">관리자 승인 후 이용 가능합니다</p>
+        </div>
+
+        <form onSubmit={handleSubmit} className="space-y-4">
             <Input
               label="이름"
               id="name"
@@ -137,16 +129,14 @@ export default function RegisterPage() {
             <Button type="submit" className="w-full" disabled={isLoading}>
               {isLoading ? '가입 중...' : '회원가입'}
             </Button>
-
-            <div className="text-center text-sm text-neutral-600">
-              이미 계정이 있으신가요?{' '}
-              <Link href="/auth/login" className="text-primary hover:underline">
-                로그인
-              </Link>
-            </div>
           </form>
-        </CardContent>
-      </Card>
+
+          <div className="text-center text-xs text-neutral-500">
+            <Link href="/auth/login" className="hover:text-neutral-700">
+              이미 계정이 있으신가요?
+            </Link>
+          </div>
+      </div>
     </div>
   )
 }
