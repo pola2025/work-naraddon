@@ -41,3 +41,6 @@ client_secret_*.json
 
 # Claude settings
 .claude/settings.local.json
+
+# Scripts (contains sensitive data)
+scripts/
