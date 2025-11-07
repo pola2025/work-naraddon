@@ -1,0 +1,8 @@
+# work.naraddon.com - 내부 업무 관리 시스템
+# 모든 검색 엔진 크롤링 차단
+
+User-agent: *
+Disallow: /
+
+# 모든 사이트맵 차단
+Sitemap: none

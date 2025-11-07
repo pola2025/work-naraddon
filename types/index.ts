@@ -1,0 +1,77 @@
+// 사용자
+export interface User {
+  _id: string
+  email: string
+  name: string
+  role: 'admin' | 'user'
+  isApproved: boolean
+  createdAt: Date
+  updatedAt: Date
+}
+
+// 업무 (칸반 보드)
+export interface Task {
+  _id: string
+  title: string
+  description: string
+  status: 'requested' | 'in_progress' | 'review' | 'completed'
+  priority: 'low' | 'medium' | 'high' | 'urgent'
+  assignee: string // user _id
+  requester: string // user _id
+  dueDate?: Date
+  comments: Comment[]
+  createdAt: Date
+  updatedAt: Date
+}
+
+// 댓글
+export interface Comment {
+  _id: string
+  author: string // user _id
+  content: string
+  createdAt: Date
+}
+
+// 운영 계정
+export interface OperatingAccount {
+  _id: string
+  platform: string // 플랫폼 (네이버, 구글, AWS 등)
+  accountName: string // 계정 이름
+  username: string // 아이디
+  password: string // 비밀번호
+  note?: string // 메모
+  lastUsedAt?: Date
+  createdBy: string // user _id
+  createdAt: Date
+  updatedAt: Date
+}
+
+// 블로그 포스팅 기록
+export interface BlogPost {
+  _id: string
+  title: string // 포스팅 제목
+  url: string // 포스팅 URL
+  keyword: string // 검색 키워드
+  rankings: Ranking[] // 순위 기록
+  author: string // user _id
+  createdAt: Date
+  updatedAt: Date
+}
+
+// 순위 기록
+export interface Ranking {
+  rank: number
+  checkedAt: Date
+  checkedBy: string // user _id
+}
+
+// NextAuth 세션
+export interface Session {
+  user: {
+    id: string
+    email: string
+    name: string
+    role: 'admin' | 'user'
+    isApproved: boolean
+  }
+}
