@@ -26,7 +26,11 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
       return NextResponse.json({ error: '업무를 찾을 수 없습니다' }, { status: 404 })
     }
 
+    // 자동 넘버링: 현재 댓글 개수 + 1
+    const commentNumber = task.comments.length + 1
+
     const newComment = {
+      number: commentNumber,
       author: session.user.id,
       content: content.trim(),
       createdAt: new Date(),

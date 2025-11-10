@@ -36,6 +36,7 @@ export interface Attachment {
 // 댓글
 export interface Comment {
   _id: string
+  number: number // 댓글 넘버링 (1, 2, 3...)
   author: string // user _id
   content: string
   createdAt: Date

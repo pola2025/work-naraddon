@@ -265,6 +265,9 @@ export function TaskDetailModal({ isOpen, onClose, task, onUpdate, isAdmin }: Ta
                 {task.comments.map((comment, index) => (
                   <div key={index} className="bg-neutral-50 rounded-lg p-3">
                     <div className="flex items-center gap-2 mb-2">
+                      <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-primary text-white text-xs font-bold mr-1">
+                        {comment.number}
+                      </span>
                       <span className="font-medium text-sm text-neutral-900">{comment.author}</span>
                       <span className="text-xs text-neutral-500">
                         {format(new Date(comment.createdAt), 'yyyy-MM-dd HH:mm')}

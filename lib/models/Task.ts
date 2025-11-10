@@ -3,6 +3,10 @@ import { Task, Comment } from '@/types'
 
 const CommentSchema = new Schema<Comment>(
   {
+    number: {
+      type: Number,
+      required: true,
+    },
     author: {
       type: String,
       required: true,
