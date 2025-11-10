@@ -114,9 +114,11 @@ export function KanbanBoard({ onTaskClick, onCreateTask, isAdmin }: KanbanBoardP
         <div className="bg-white rounded-lg border border-neutral-200 overflow-hidden">
           {/* 테이블 헤더 */}
           <div className="grid grid-cols-12 gap-4 px-6 py-3 bg-neutral-50 border-b border-neutral-200 font-medium text-sm text-neutral-700">
-            <div className="col-span-4">업무 제목</div>
+            <div className="col-span-1 text-center">번호</div>
+            <div className="col-span-1">날짜</div>
+            <div className="col-span-3">제목</div>
             <div className="col-span-2">상태</div>
-            <div className="col-span-2">마감일</div>
+            <div className="col-span-1">마감일</div>
             <div className="col-span-3">URL</div>
             <div className="col-span-1 text-center">댓글</div>
           </div>
@@ -129,22 +131,25 @@ export function KanbanBoard({ onTaskClick, onCreateTask, isAdmin }: KanbanBoardP
                 className="grid grid-cols-12 gap-4 px-6 py-4 hover:bg-neutral-50 transition-colors cursor-pointer"
                 onClick={() => onTaskClick(task)}
               >
-                {/* 제목 */}
-                <div className="col-span-4">
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="inline-flex items-center justify-center min-w-[24px] h-5 px-2 rounded-full bg-primary text-white text-xs font-bold">
-                      {task.number}
-                    </span>
-                    {task.createdAt && (
-                      <span className="text-xs text-neutral-500">
-                        {format(new Date(task.createdAt), 'yyyy-MM-dd')}
-                      </span>
-                    )}
-                  </div>
-                  <h3 className="font-medium text-neutral-900 mb-1 line-clamp-1">{task.title}</h3>
-                  {task.description && (
-                    <p className="text-sm text-neutral-600 line-clamp-1">{task.description}</p>
+                {/* 번호 */}
+                <div className="col-span-1 flex items-center justify-center">
+                  <span className="inline-flex items-center justify-center min-w-[28px] h-6 px-2 rounded-full bg-primary text-white text-xs font-bold">
+                    {task.number}
+                  </span>
+                </div>
+
+                {/* 날짜 */}
+                <div className="col-span-1 flex items-center text-sm text-neutral-600">
+                  {task.createdAt ? (
+                    <span>{format(new Date(task.createdAt), 'yyyy-MM-dd')}</span>
+                  ) : (
+                    <span className="text-neutral-400">-</span>
                   )}
+                </div>
+
+                {/* 제목 */}
+                <div className="col-span-3 flex items-center">
+                  <h3 className="font-medium text-neutral-900 line-clamp-1">{task.title}</h3>
                 </div>
 
                 {/* 상태 */}
@@ -171,12 +176,9 @@ export function KanbanBoard({ onTaskClick, onCreateTask, isAdmin }: KanbanBoardP
                 </div>
 
                 {/* 마감일 */}
-                <div className="col-span-2 flex items-center text-sm text-neutral-600">
+                <div className="col-span-1 flex items-center text-sm text-neutral-600">
                   {task.dueDate ? (
-                    <div className="flex items-center gap-1">
-                      <HiOutlineClock className="w-4 h-4" />
-                      <span>{format(new Date(task.dueDate), 'yyyy-MM-dd')}</span>
-                    </div>
+                    <span>{format(new Date(task.dueDate), 'MM-dd')}</span>
                   ) : (
                     <span className="text-neutral-400">-</span>
                   )}
