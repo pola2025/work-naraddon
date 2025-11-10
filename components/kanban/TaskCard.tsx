@@ -35,9 +35,11 @@ export function TaskCard({ task, onClick }: TaskCardProps) {
           <span className="inline-flex items-center justify-center min-w-[24px] h-6 px-2 rounded-full bg-primary text-white text-xs font-bold">
             {task.number}
           </span>
-          <span className="text-xs text-neutral-500 mt-0.5">
-            {format(new Date(task.createdAt), 'yyyy-MM-dd')}
-          </span>
+          {task.createdAt && (
+            <span className="text-xs text-neutral-500 mt-0.5">
+              {format(new Date(task.createdAt), 'yyyy-MM-dd')}
+            </span>
+          )}
         </div>
         <h4 className="font-medium text-neutral-900 line-clamp-2">{task.title}</h4>
       </div>

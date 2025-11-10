@@ -44,3 +44,5 @@ client_secret_*.json
 
 # Scripts (contains sensitive data)
 scripts/
+
+.vercel
