@@ -51,7 +51,12 @@ export async function POST(req: NextRequest) {
 
     await dbConnect()
 
+    // 자동 넘버링: 현재 업무 개수 + 1
+    const taskCount = await TaskModel.countDocuments()
+    const taskNumber = taskCount + 1
+
     const task = await TaskModel.create({
+      number: taskNumber,
       title,
       description: description || '',
       url: url || '',
