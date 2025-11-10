@@ -131,6 +131,16 @@ export function KanbanBoard({ onTaskClick, onCreateTask, isAdmin }: KanbanBoardP
               >
                 {/* 제목 */}
                 <div className="col-span-4">
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="inline-flex items-center justify-center min-w-[24px] h-5 px-2 rounded-full bg-primary text-white text-xs font-bold">
+                      {task.number}
+                    </span>
+                    {task.createdAt && (
+                      <span className="text-xs text-neutral-500">
+                        {format(new Date(task.createdAt), 'yyyy-MM-dd')}
+                      </span>
+                    )}
+                  </div>
                   <h3 className="font-medium text-neutral-900 mb-1 line-clamp-1">{task.title}</h3>
                   {task.description && (
                     <p className="text-sm text-neutral-600 line-clamp-1">{task.description}</p>
