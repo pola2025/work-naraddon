@@ -113,14 +113,14 @@ export function KanbanBoard({ onTaskClick, onCreateTask, isAdmin }: KanbanBoardP
       ) : (
         <div className="bg-white rounded-lg border border-neutral-200 overflow-hidden">
           {/* 테이블 헤더 */}
-          <div className="grid grid-cols-12 gap-4 px-6 py-3 bg-neutral-50 border-b border-neutral-200 font-medium text-sm text-neutral-700">
-            <div className="col-span-1 text-center">번호</div>
-            <div className="col-span-1">날짜</div>
-            <div className="col-span-3">제목</div>
-            <div className="col-span-2">상태</div>
-            <div className="col-span-1">마감일</div>
-            <div className="col-span-3">URL</div>
-            <div className="col-span-1 text-center">댓글</div>
+          <div className="grid gap-4 px-6 py-3 bg-neutral-50 border-b border-neutral-200 font-medium text-sm text-neutral-700" style={{ gridTemplateColumns: '60px 110px 1fr 140px 90px 200px 70px' }}>
+            <div className="text-center">번호</div>
+            <div>날짜</div>
+            <div>제목</div>
+            <div>상태</div>
+            <div>마감일</div>
+            <div>URL</div>
+            <div className="text-center">댓글</div>
           </div>
 
           {/* 업무 목록 */}
@@ -128,18 +128,19 @@ export function KanbanBoard({ onTaskClick, onCreateTask, isAdmin }: KanbanBoardP
             {tasks.map(task => (
               <div
                 key={task._id}
-                className="grid grid-cols-12 gap-4 px-6 py-4 hover:bg-neutral-50 transition-colors cursor-pointer"
+                className="grid gap-4 px-6 py-4 hover:bg-neutral-50 transition-colors cursor-pointer"
+                style={{ gridTemplateColumns: '60px 110px 1fr 140px 90px 200px 70px' }}
                 onClick={() => onTaskClick(task)}
               >
                 {/* 번호 */}
-                <div className="col-span-1 flex items-center justify-center">
+                <div className="flex items-center justify-center">
                   <span className="inline-flex items-center justify-center min-w-[28px] h-6 px-2 rounded-full bg-primary text-white text-xs font-bold">
                     {task.number}
                   </span>
                 </div>
 
                 {/* 날짜 */}
-                <div className="col-span-1 flex items-center text-sm text-neutral-600">
+                <div className="flex items-center text-sm text-neutral-600">
                   {task.createdAt ? (
                     <span>{format(new Date(task.createdAt), 'yyyy-MM-dd')}</span>
                   ) : (
@@ -148,12 +149,12 @@ export function KanbanBoard({ onTaskClick, onCreateTask, isAdmin }: KanbanBoardP
                 </div>
 
                 {/* 제목 */}
-                <div className="col-span-3 flex items-center">
+                <div className="flex items-center">
                   <h3 className="font-medium text-neutral-900 line-clamp-1">{task.title}</h3>
                 </div>
 
                 {/* 상태 */}
-                <div className="col-span-2 flex items-center">
+                <div className="flex items-center">
                   {isAdmin ? (
                     <select
                       value={task.status}
@@ -176,7 +177,7 @@ export function KanbanBoard({ onTaskClick, onCreateTask, isAdmin }: KanbanBoardP
                 </div>
 
                 {/* 마감일 */}
-                <div className="col-span-1 flex items-center text-sm text-neutral-600">
+                <div className="flex items-center text-sm text-neutral-600">
                   {task.dueDate ? (
                     <span>{format(new Date(task.dueDate), 'MM-dd')}</span>
                   ) : (
@@ -185,7 +186,7 @@ export function KanbanBoard({ onTaskClick, onCreateTask, isAdmin }: KanbanBoardP
                 </div>
 
                 {/* URL */}
-                <div className="col-span-3 flex items-center text-sm">
+                <div className="flex items-center text-sm">
                   {task.url ? (
                     <a
                       href={task.url}
@@ -203,7 +204,7 @@ export function KanbanBoard({ onTaskClick, onCreateTask, isAdmin }: KanbanBoardP
                 </div>
 
                 {/* 댓글 수 */}
-                <div className="col-span-1 flex items-center justify-center">
+                <div className="flex items-center justify-center">
                   <span className="text-sm text-neutral-600">
                     {task.comments.length > 0 ? task.comments.length : '-'}
                   </span>
