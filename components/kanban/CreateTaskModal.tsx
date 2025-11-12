@@ -15,6 +15,7 @@ export function CreateTaskModal({ isOpen, onClose, onSuccess }: CreateTaskModalP
   const [formData, setFormData] = useState({
     title: '',
     description: '',
+    category: '기능개발' as '기능개발' | '디자인' | '마케팅' | '기타',
     url: '',
     dueDate: '',
   })
@@ -60,6 +61,7 @@ export function CreateTaskModal({ isOpen, onClose, onSuccess }: CreateTaskModalP
       setFormData({
         title: '',
         description: '',
+        category: '기능개발',
         url: '',
         dueDate: '',
       })
@@ -83,6 +85,24 @@ export function CreateTaskModal({ isOpen, onClose, onSuccess }: CreateTaskModalP
           placeholder="업무 제목을 입력하세요"
           required
         />
+
+        <div>
+          <label htmlFor="category" className="block text-sm font-medium text-neutral-700 mb-2">
+            카테고리 <span className="text-red-600">*</span>
+          </label>
+          <select
+            id="category"
+            value={formData.category}
+            onChange={e => setFormData({ ...formData, category: e.target.value as any })}
+            className="w-full px-3 py-2 border border-neutral-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+            required
+          >
+            <option value="기능개발">기능개발</option>
+            <option value="디자인">디자인</option>
+            <option value="마케팅">마케팅</option>
+            <option value="기타">기타</option>
+          </select>
+        </div>
 
         <div>
           <label htmlFor="description" className="block text-sm font-medium text-neutral-700 mb-2">

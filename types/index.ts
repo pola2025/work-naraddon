@@ -15,6 +15,7 @@ export interface Task {
   number: number // 업무 넘버링 (1, 2, 3...)
   title: string
   description: string
+  category: '기능개발' | '디자인' | '마케팅' | '기타'
   status: 'preparing' | 'in_progress' | 'completed'
   url?: string
   attachments?: Attachment[]

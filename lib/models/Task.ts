@@ -34,6 +34,11 @@ const TaskSchema = new Schema<Task>(
       type: String,
       default: '',
     },
+    category: {
+      type: String,
+      enum: ['기능개발', '디자인', '마케팅', '기타'],
+      required: true,
+    },
     status: {
       type: String,
       enum: ['preparing', 'in_progress', 'completed'],

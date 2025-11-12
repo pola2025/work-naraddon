@@ -41,6 +41,16 @@ export function TaskCard({ task, onClick }: TaskCardProps) {
             </span>
           )}
         </div>
+        <div className="flex items-center gap-2 mb-1">
+          <span className={`px-2 py-0.5 rounded text-xs font-medium ${
+            task.category === '기능개발' ? 'bg-blue-100 text-blue-700' :
+            task.category === '디자인' ? 'bg-purple-100 text-purple-700' :
+            task.category === '마케팅' ? 'bg-green-100 text-green-700' :
+            'bg-neutral-100 text-neutral-700'
+          }`}>
+            {task.category}
+          </span>
+        </div>
         <h4 className="font-medium text-neutral-900 line-clamp-2">{task.title}</h4>
       </div>
 

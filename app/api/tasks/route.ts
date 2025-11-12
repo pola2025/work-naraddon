@@ -40,11 +40,18 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: '인증이 필요합니다' }, { status: 401 })
     }
 
-    const { title, description, url, attachments, dueDate } = await req.json()
+    const { title, description, category, url, attachments, dueDate } = await req.json()
 
     if (!title) {
       return NextResponse.json(
         { error: '제목은 필수입니다' },
+        { status: 400 }
+      )
+    }
+
+    if (!category) {
+      return NextResponse.json(
+        { error: '카테고리는 필수입니다' },
         { status: 400 }
       )
     }
@@ -59,6 +66,7 @@ export async function POST(req: NextRequest) {
       number: taskNumber,
       title,
       description: description || '',
+      category,
       url: url || '',
       attachments: attachments || [],
       status: 'preparing',

@@ -24,6 +24,7 @@ export function TaskDetailModal({ isOpen, onClose, task, onUpdate, isAdmin }: Ta
   const [editForm, setEditForm] = useState({
     title: '',
     description: '',
+    category: '기능개발' as Task['category'],
     url: '',
     status: '' as Task['status'],
     dueDate: '',
@@ -37,6 +38,7 @@ export function TaskDetailModal({ isOpen, onClose, task, onUpdate, isAdmin }: Ta
     setEditForm({
       title: task.title,
       description: task.description,
+      category: task.category,
       url: task.url || '',
       status: task.status,
       dueDate: task.dueDate ? new Date(task.dueDate).toISOString().split('T')[0] : '',
@@ -59,6 +61,7 @@ export function TaskDetailModal({ isOpen, onClose, task, onUpdate, isAdmin }: Ta
         body: JSON.stringify({
           title: editForm.title,
           description: editForm.description,
+          category: editForm.category,
           url: editForm.url,
           status: editForm.status,
           dueDate: editForm.dueDate ? new Date(editForm.dueDate) : undefined,
@@ -139,6 +142,23 @@ export function TaskDetailModal({ isOpen, onClose, task, onUpdate, isAdmin }: Ta
             />
 
             <div>
+              <label htmlFor="edit-category" className="block text-sm font-medium text-neutral-700 mb-2">
+                카테고리
+              </label>
+              <select
+                id="edit-category"
+                value={editForm.category}
+                onChange={e => setEditForm({ ...editForm, category: e.target.value as Task['category'] })}
+                className="w-full px-3 py-2 border border-neutral-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+              >
+                <option value="기능개발">기능개발</option>
+                <option value="디자인">디자인</option>
+                <option value="마케팅">마케팅</option>
+                <option value="기타">기타</option>
+              </select>
+            </div>
+
+            <div>
               <label htmlFor="edit-description" className="block text-sm font-medium text-neutral-700 mb-2">
                 설명
               </label>
@@ -215,6 +235,18 @@ export function TaskDetailModal({ isOpen, onClose, task, onUpdate, isAdmin }: Ta
               </div>
 
               <div className="flex flex-wrap gap-4 text-sm">
+                <div className="flex items-center gap-2">
+                  <span className="text-neutral-600">카테고리:</span>
+                  <span className={`px-2 py-1 rounded font-medium ${
+                    task.category === '기능개발' ? 'bg-blue-100 text-blue-700' :
+                    task.category === '디자인' ? 'bg-purple-100 text-purple-700' :
+                    task.category === '마케팅' ? 'bg-green-100 text-green-700' :
+                    'bg-neutral-100 text-neutral-700'
+                  }`}>
+                    {task.category}
+                  </span>
+                </div>
+
                 <div className="flex items-center gap-2">
                   <span className="text-neutral-600">상태:</span>
                   <span className="px-2 py-1 bg-neutral-100 rounded font-medium">
