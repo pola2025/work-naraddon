@@ -14,7 +14,7 @@ export default function TasksPage() {
   const [selectedTask, setSelectedTask] = useState<Task | null>(null)
   const [refreshKey, setRefreshKey] = useState(0)
 
-  const isAdmin = session?.user?.role === 'admin'
+  const isAdmin = session?.user?.role === 'admin' || session?.user?.role === 'master'
 
   const handleRefresh = () => {
     setRefreshKey(prev => prev + 1)
