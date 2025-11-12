@@ -13,7 +13,8 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
     }
 
     // 관리자만 수정 가능
-    if (session.user.role !== 'admin') {
+    const isAdmin = session.user.role === 'admin' || session.user.role === 'master'
+    if (!isAdmin) {
       return NextResponse.json({ error: '권한이 없습니다' }, { status: 403 })
     }
 
@@ -53,7 +54,8 @@ export async function DELETE(req: NextRequest, { params }: { params: { id: strin
     }
 
     // 관리자만 삭제 가능
-    if (session.user.role !== 'admin') {
+    const isAdmin = session.user.role === 'admin' || session.user.role === 'master'
+    if (!isAdmin) {
       return NextResponse.json({ error: '권한이 없습니다' }, { status: 403 })
     }
 

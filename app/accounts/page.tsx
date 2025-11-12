@@ -41,7 +41,8 @@ export default function AccountsPage() {
   }
 
   // 관리자가 아니면 접근 거부
-  if (!session || session.user.role !== 'admin') {
+  const isAdmin = session?.user.role === 'admin' || session?.user.role === 'master'
+  if (!session || !isAdmin) {
     return (
       <DashboardLayout>
         <div className="flex flex-col items-center justify-center py-12">
