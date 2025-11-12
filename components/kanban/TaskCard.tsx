@@ -31,7 +31,7 @@ export function TaskCard({ task, onClick }: TaskCardProps) {
     >
       {/* 헤더 */}
       <div className="mb-2">
-        <div className="flex items-start gap-2 mb-1">
+        <div className="flex items-start gap-2 mb-2">
           <span className="inline-flex items-center justify-center min-w-[24px] h-6 px-2 rounded-full bg-primary text-white text-xs font-bold">
             {task.number}
           </span>
@@ -41,8 +41,8 @@ export function TaskCard({ task, onClick }: TaskCardProps) {
             </span>
           )}
         </div>
-        <div className="flex items-center gap-2 mb-1">
-          <span className={`px-2 py-0.5 rounded text-xs font-medium ${
+        <div className="flex items-start gap-2">
+          <span className={`px-2 py-0.5 rounded text-xs font-medium whitespace-nowrap ${
             task.category === '기능개발' ? 'bg-blue-100 text-blue-700' :
             task.category === '디자인' ? 'bg-purple-100 text-purple-700' :
             task.category === '마케팅' ? 'bg-green-100 text-green-700' :
@@ -50,8 +50,8 @@ export function TaskCard({ task, onClick }: TaskCardProps) {
           }`}>
             {task.category}
           </span>
+          <h4 className="font-medium text-neutral-900 line-clamp-2 flex-1">{task.title}</h4>
         </div>
-        <h4 className="font-medium text-neutral-900 line-clamp-2">{task.title}</h4>
       </div>
 
       {/* 설명 */}
