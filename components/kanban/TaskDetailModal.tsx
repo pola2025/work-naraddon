@@ -38,7 +38,7 @@ export function TaskDetailModal({ isOpen, onClose, task, onUpdate, isAdmin }: Ta
     setEditForm({
       title: task.title,
       description: task.description,
-      category: task.category,
+      category: task.category || '기능개발', // 카테고리가 없으면 기본값 사용
       url: task.url || '',
       status: task.status,
       dueDate: task.dueDate ? new Date(task.dueDate).toISOString().split('T')[0] : '',
@@ -143,13 +143,16 @@ export function TaskDetailModal({ isOpen, onClose, task, onUpdate, isAdmin }: Ta
 
             <div>
               <label htmlFor="edit-category" className="block text-sm font-medium text-neutral-700 mb-2">
-                카테고리
+                카테고리 <span className="text-red-600">*</span>
               </label>
               <select
                 id="edit-category"
+                name="category"
                 value={editForm.category}
+                defaultValue="기능개발"
                 onChange={e => setEditForm({ ...editForm, category: e.target.value as Task['category'] })}
-                className="w-full px-3 py-2 border border-neutral-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+                className="w-full px-3 py-2 border border-neutral-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary bg-white"
+                required
               >
                 <option value="기능개발">기능개발</option>
                 <option value="디자인">디자인</option>
