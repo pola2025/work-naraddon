@@ -112,10 +112,11 @@ export function KanbanBoard({ onTaskClick, onCreateTask, isAdmin }: KanbanBoardP
         </div>
       ) : (
         <div className="bg-white rounded-lg border border-neutral-200 overflow-hidden">
-          {/* 테이블 헤더 */}
-          <div className="grid gap-4 px-6 py-3 bg-neutral-50 border-b border-neutral-200 font-medium text-sm text-neutral-700" style={{ gridTemplateColumns: '60px 110px 1fr 140px 90px 200px 70px' }}>
+          {/* 데스크톱 테이블 헤더 */}
+          <div className="hidden md:grid gap-4 px-6 py-3 bg-neutral-50 border-b border-neutral-200 font-medium text-sm text-neutral-700" style={{ gridTemplateColumns: '60px 110px 100px 1fr 140px 90px 200px 70px' }}>
             <div className="text-center">번호</div>
             <div>날짜</div>
+            <div>카테고리</div>
             <div>제목</div>
             <div>상태</div>
             <div>마감일</div>
@@ -126,12 +127,14 @@ export function KanbanBoard({ onTaskClick, onCreateTask, isAdmin }: KanbanBoardP
           {/* 업무 목록 */}
           <div className="divide-y divide-neutral-200">
             {tasks.map(task => (
-              <div
-                key={task._id}
-                className="grid gap-4 px-6 py-4 hover:bg-neutral-50 transition-colors cursor-pointer"
-                style={{ gridTemplateColumns: '60px 110px 1fr 140px 90px 200px 70px' }}
-                onClick={() => onTaskClick(task)}
-              >
+              <>
+                {/* 데스크톱 뷰 */}
+                <div
+                  key={`desktop-${task._id}`}
+                  className="hidden md:grid gap-4 px-6 py-4 hover:bg-neutral-50 transition-colors cursor-pointer"
+                  style={{ gridTemplateColumns: '60px 110px 100px 1fr 140px 90px 200px 70px' }}
+                  onClick={() => onTaskClick(task)}
+                >
                 {/* 번호 */}
                 <div className="flex items-center justify-center">
                   <span className="inline-flex items-center justify-center min-w-[28px] h-6 px-2 rounded-full bg-primary text-white text-xs font-bold">
@@ -145,6 +148,22 @@ export function KanbanBoard({ onTaskClick, onCreateTask, isAdmin }: KanbanBoardP
                     <span>{format(new Date(task.createdAt), 'yyyy-MM-dd')}</span>
                   ) : (
                     <span className="text-neutral-400">-</span>
+                  )}
+                </div>
+
+                {/* 카테고리 */}
+                <div className="flex items-center">
+                  {task.category ? (
+                    <span className={`px-2 py-0.5 rounded text-xs font-medium whitespace-nowrap ${
+                      task.category === '기능개발' ? 'bg-blue-100 text-blue-700' :
+                      task.category === '디자인' ? 'bg-purple-100 text-purple-700' :
+                      task.category === '마케팅' ? 'bg-green-100 text-green-700' :
+                      'bg-neutral-100 text-neutral-700'
+                    }`}>
+                      {task.category}
+                    </span>
+                  ) : (
+                    <span className="text-neutral-400 text-xs">-</span>
                   )}
                 </div>
 
@@ -210,6 +229,65 @@ export function KanbanBoard({ onTaskClick, onCreateTask, isAdmin }: KanbanBoardP
                   </span>
                 </div>
               </div>
+
+              {/* 모바일 뷰 */}
+              <div
+                key={`mobile-${task._id}`}
+                className="md:hidden p-4 hover:bg-neutral-50 transition-colors cursor-pointer"
+                onClick={() => onTaskClick(task)}
+              >
+                {/* 번호 + 날짜 */}
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="inline-flex items-center justify-center min-w-[24px] h-6 px-2 rounded-full bg-primary text-white text-xs font-bold">
+                    {task.number}
+                  </span>
+                  {task.createdAt && (
+                    <span className="text-xs text-neutral-500">
+                      {format(new Date(task.createdAt), 'yyyy-MM-dd')}
+                    </span>
+                  )}
+                </div>
+
+                {/* 카테고리 + 제목 */}
+                <div className="flex items-start gap-2 mb-2">
+                  {task.category && (
+                    <span className={`px-2 py-0.5 rounded text-xs font-medium whitespace-nowrap ${
+                      task.category === '기능개발' ? 'bg-blue-100 text-blue-700' :
+                      task.category === '디자인' ? 'bg-purple-100 text-purple-700' :
+                      task.category === '마케팅' ? 'bg-green-100 text-green-700' :
+                      'bg-neutral-100 text-neutral-700'
+                    }`}>
+                      {task.category}
+                    </span>
+                  )}
+                  <h3 className="font-medium text-neutral-900 flex-1">{task.title}</h3>
+                </div>
+
+                {/* 상태 + 마감일 */}
+                <div className="flex items-center gap-2 mb-2">
+                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${statusColors[task.status]}`}>
+                    {statusLabels[task.status]}
+                  </span>
+                  {task.dueDate && (
+                    <div className="flex items-center gap-1 text-xs text-neutral-600">
+                      <HiOutlineClock className="w-3 h-3" />
+                      <span>{format(new Date(task.dueDate), 'MM-dd')}</span>
+                    </div>
+                  )}
+                  {task.comments.length > 0 && (
+                    <span className="text-xs text-neutral-600 ml-auto">💬 {task.comments.length}</span>
+                  )}
+                </div>
+
+                {/* URL */}
+                {task.url && (
+                  <div className="flex items-center gap-1 text-xs text-blue-600">
+                    <HiOutlineLink className="w-3 h-3 flex-shrink-0" />
+                    <span className="truncate">{task.url}</span>
+                  </div>
+                )}
+              </div>
+              </>
             ))}
           </div>
         </div>
