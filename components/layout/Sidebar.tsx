@@ -9,14 +9,16 @@ import {
   HiOutlineKey,
   HiOutlineDocumentText,
   HiOutlineLightBulb,
+  HiOutlineUsers,
 } from 'react-icons/hi'
 
 const navigation = [
-  { name: '대시보드', href: '/dashboard', icon: HiOutlineHome, adminOnly: false },
-  { name: '업무 관리', href: '/tasks', icon: HiOutlineClipboardList, adminOnly: false },
-  { name: '운영 계정', href: '/accounts', icon: HiOutlineKey, adminOnly: true },
-  { name: '블로그 포스팅', href: '/blog-posts', icon: HiOutlineDocumentText, adminOnly: false },
-  { name: '콘텐츠 제작 Tip', href: '/content-tips', icon: HiOutlineLightBulb, adminOnly: false },
+  { name: '대시보드', href: '/dashboard', icon: HiOutlineHome, adminOnly: false, masterOnly: false },
+  { name: '업무 관리', href: '/tasks', icon: HiOutlineClipboardList, adminOnly: false, masterOnly: false },
+  { name: '운영 계정', href: '/accounts', icon: HiOutlineKey, adminOnly: true, masterOnly: false },
+  { name: '블로그 포스팅', href: '/blog-posts', icon: HiOutlineDocumentText, adminOnly: false, masterOnly: false },
+  { name: '콘텐츠 제작 Tip', href: '/content-tips', icon: HiOutlineLightBulb, adminOnly: false, masterOnly: false },
+  { name: '사용자 관리', href: '/users', icon: HiOutlineUsers, adminOnly: false, masterOnly: true },
 ]
 
 export function Sidebar() {
@@ -25,8 +27,13 @@ export function Sidebar() {
 
   // 사용자 권한에 따라 메뉴 필터링
   const filteredNavigation = navigation.filter(item => {
+    // 마스터 관리자 전용 메뉴
+    if (item.masterOnly) {
+      return session?.user?.role === 'master'
+    }
+    // 관리자 전용 메뉴
     if (item.adminOnly) {
-      return session?.user?.role === 'admin'
+      return session?.user?.role === 'admin' || session?.user?.role === 'master'
     }
     return true
   })

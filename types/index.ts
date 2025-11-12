@@ -3,7 +3,7 @@ export interface User {
   _id: string
   email: string
   name: string
-  role: 'admin' | 'user'
+  role: 'master' | 'admin' | 'user'
   isApproved: boolean
   createdAt: Date
   updatedAt: Date
@@ -84,7 +84,7 @@ export interface Session {
     id: string
     email: string
     name: string
-    role: 'admin' | 'user'
+    role: 'master' | 'admin' | 'user'
     isApproved: boolean
   }
 }
