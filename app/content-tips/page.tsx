@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { DashboardLayout } from '@/components/layout/DashboardLayout'
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card'
+import { Card, CardContent } from '@/components/ui/Card'
 import { Spinner } from '@/components/ui/Spinner'
 import { Modal } from '@/components/ui/Modal'
 
@@ -20,10 +20,10 @@ type ContentTip = {
 }
 
 const CATEGORIES: Record<string, { name: string; icon: string }> = {
+  ai: { name: 'AI 활용', icon: '🤖' },
   instagram: { name: '인스타그램', icon: '📸' },
   meta_ads: { name: 'Meta 광고', icon: '📊' },
   naver_blog: { name: '네이버 블로그', icon: '✍️' },
-  ai: { name: 'AI 활용', icon: '🤖' },
 }
 
 export default function ContentTipsPage() {
@@ -34,6 +34,15 @@ export default function ContentTipsPage() {
   const [selectedTip, setSelectedTip] = useState<ContentTip | null>(null)
   const [selectedCategory, setSelectedCategory] = useState<string>('all')
   const [searchQuery, setSearchQuery] = useState('')
+
+  // 카테고리별 개수 계산
+  const categoryCounts = {
+    all: tips.length,
+    ai: tips.filter(t => t.category === 'ai').length,
+    instagram: tips.filter(t => t.category === 'instagram').length,
+    meta_ads: tips.filter(t => t.category === 'meta_ads').length,
+    naver_blog: tips.filter(t => t.category === 'naver_blog').length,
+  }
 
   useEffect(() => {
     fetchContentTips()
@@ -48,7 +57,6 @@ export default function ContentTipsPage() {
       setLoading(true)
       setError(null)
 
-      // 스타트패키지 Public API 호출
       const response = await fetch('https://www.polaai.co.kr/api/public/content-tips')
 
       if (!response.ok) {
@@ -147,53 +155,96 @@ export default function ContentTipsPage() {
               💡 콘텐츠 제작 Tip
             </h1>
             <p className="text-neutral-600 mt-2">
-              유용한 콘텐츠 제작 팁과 참고 자료 (총 {filteredTips.length}개)
+              유용한 콘텐츠 제작 팁과 참고 자료
             </p>
           </div>
         </div>
 
-        {/* 필터 및 검색 */}
+        {/* Tab 네비게이션 */}
+        <div className="border-b border-neutral-200">
+          <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-px">
+            {/* 전체 Tab */}
+            <button
+              onClick={() => setSelectedCategory('all')}
+              className={`
+                min-w-[90px] md:min-w-[120px] px-4 md:px-6 py-2 md:py-3
+                text-sm md:text-base font-medium whitespace-nowrap
+                transition-all duration-200 flex-shrink-0
+                ${
+                  selectedCategory === 'all'
+                    ? 'text-primary border-b-3 border-primary bg-primary/5'
+                    : 'text-neutral-600 hover:text-neutral-900 hover:bg-neutral-50'
+                }
+              `}
+              style={{ borderBottomWidth: selectedCategory === 'all' ? '3px' : '0' }}
+            >
+              <span className="hidden md:inline">전체 </span>
+              <span className="md:hidden">전체</span>
+              <span className="text-xs md:text-sm ml-1">({categoryCounts.all})</span>
+            </button>
+
+            {/* 카테고리 Tabs */}
+            {Object.entries(CATEGORIES).map(([key, category]) => (
+              <button
+                key={key}
+                onClick={() => setSelectedCategory(key)}
+                className={`
+                  min-w-[100px] md:min-w-[140px] px-3 md:px-6 py-2 md:py-3
+                  text-sm md:text-base font-medium whitespace-nowrap
+                  transition-all duration-200 flex items-center justify-center gap-1 md:gap-2 flex-shrink-0
+                  ${
+                    selectedCategory === key
+                      ? 'text-primary border-b-3 border-primary bg-primary/5'
+                      : 'text-neutral-600 hover:text-neutral-900 hover:bg-neutral-50'
+                  }
+                `}
+                style={{ borderBottomWidth: selectedCategory === key ? '3px' : '0' }}
+              >
+                <span className="text-base md:text-lg">{category.icon}</span>
+                <span className="hidden md:inline">{category.name}</span>
+                <span className="md:hidden text-xs">{category.name.replace(' ', '')}</span>
+                <span className="text-xs md:text-sm">({categoryCounts[key as keyof typeof categoryCounts]})</span>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* 스크롤 힌트 (모바일) */}
+        <style jsx>{`
+          .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+          }
+          .scrollbar-hide {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+          }
+        `}</style>
+
+        {/* 검색 */}
         <Card>
           <CardContent>
-            <div className="flex flex-col md:flex-row gap-4">
-              {/* 카테고리 필터 */}
-              <div className="flex-1">
-                <label className="block text-sm font-medium text-neutral-700 mb-2">
-                  카테고리
-                </label>
-                <select
-                  value={selectedCategory}
-                  onChange={e => setSelectedCategory(e.target.value)}
-                  className="w-full px-3 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+            <div className="flex items-center gap-2">
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={e => setSearchQuery(e.target.value)}
+                placeholder="제목, 설명, 작성자로 검색..."
+                className="flex-1 px-4 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+              />
+              {searchQuery && (
+                <button
+                  onClick={() => setSearchQuery('')}
+                  className="px-4 py-2 text-neutral-600 hover:text-neutral-900"
                 >
-                  <option value="all">전체</option>
-                  {Object.entries(CATEGORIES).map(([key, cat]) => (
-                    <option key={key} value={key}>
-                      {cat.icon} {cat.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              {/* 검색 */}
-              <div className="flex-1">
-                <label className="block text-sm font-medium text-neutral-700 mb-2">
-                  검색
-                </label>
-                <input
-                  type="text"
-                  value={searchQuery}
-                  onChange={e => setSearchQuery(e.target.value)}
-                  placeholder="제목, 설명, 작성자로 검색..."
-                  className="w-full px-3 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
-                />
-              </div>
+                  초기화
+                </button>
+              )}
             </div>
           </CardContent>
         </Card>
 
-        {/* 게시판 테이블 */}
-        <Card>
+        {/* 게시판 테이블 (Desktop & Tablet) */}
+        <Card className="hidden md:block">
           <CardContent>
             {filteredTips.length === 0 ? (
               <div className="text-center py-12 text-neutral-500">
@@ -206,10 +257,11 @@ export default function ContentTipsPage() {
                 <table className="w-full">
                   <thead>
                     <tr className="border-b border-neutral-200">
-                      <th className="text-left py-3 px-4 font-semibold text-neutral-700 w-16">
+                      {/* Desktop: 모든 컬럼 표시 */}
+                      <th className="hidden lg:table-cell text-left py-3 px-4 font-semibold text-neutral-700 w-16">
                         번호
                       </th>
-                      <th className="text-left py-3 px-4 font-semibold text-neutral-700 w-32">
+                      <th className="text-left py-3 px-4 font-semibold text-neutral-700 min-w-[140px]">
                         카테고리
                       </th>
                       <th className="text-left py-3 px-4 font-semibold text-neutral-700">
@@ -218,7 +270,8 @@ export default function ContentTipsPage() {
                       <th className="text-left py-3 px-4 font-semibold text-neutral-700 w-24">
                         타입
                       </th>
-                      <th className="text-left py-3 px-4 font-semibold text-neutral-700 w-28">
+                      {/* Desktop only */}
+                      <th className="hidden lg:table-cell text-left py-3 px-4 font-semibold text-neutral-700 w-28">
                         작성자
                       </th>
                       <th className="text-left py-3 px-4 font-semibold text-neutral-700 w-32">
@@ -236,18 +289,18 @@ export default function ContentTipsPage() {
                           onClick={() => setSelectedTip(tip)}
                           className="border-b border-neutral-100 hover:bg-neutral-50 cursor-pointer transition-colors"
                         >
-                          <td className="py-3 px-4 text-neutral-600">
+                          <td className="hidden lg:table-cell py-3 px-4 text-neutral-600">
                             {filteredTips.length - index}
                           </td>
                           <td className="py-3 px-4">
-                            <div className="flex items-center gap-2">
+                            <div className="flex items-center gap-2 whitespace-nowrap">
                               <span className="text-lg">{category?.icon}</span>
                               <span className="text-sm font-medium text-neutral-700">
                                 {category?.name}
                               </span>
                             </div>
                             {tip.subCategory && (
-                              <span className="inline-block mt-1 px-2 py-0.5 bg-neutral-100 text-neutral-600 text-xs rounded">
+                              <span className="inline-block mt-1 px-2 py-0.5 bg-neutral-100 text-neutral-600 text-xs rounded whitespace-nowrap">
                                 {tip.subCategory}
                               </span>
                             )}
@@ -262,20 +315,20 @@ export default function ContentTipsPage() {
                           </td>
                           <td className="py-3 px-4">
                             {tip.linkType === 'youtube' ? (
-                              <span className="inline-flex items-center gap-1 px-2 py-1 bg-red-50 text-red-700 text-xs font-medium rounded">
-                                📺 YouTube
+                              <span className="inline-flex items-center gap-1 px-2 py-1 bg-red-50 text-red-700 text-xs font-medium rounded whitespace-nowrap">
+                                📺 YT
                               </span>
                             ) : (
-                              <span className="inline-flex items-center gap-1 px-2 py-1 bg-blue-50 text-blue-700 text-xs font-medium rounded">
+                              <span className="inline-flex items-center gap-1 px-2 py-1 bg-blue-50 text-blue-700 text-xs font-medium rounded whitespace-nowrap">
                                 🌐 Blog
                               </span>
                             )}
                           </td>
-                          <td className="py-3 px-4 text-sm text-neutral-600">
+                          <td className="hidden lg:table-cell py-3 px-4 text-sm text-neutral-600">
                             {tip.authorName}
                           </td>
-                          <td className="py-3 px-4 text-sm text-neutral-600">
-                            {formatDate(tip.createdAt)}
+                          <td className="py-3 px-4 text-sm text-neutral-600 whitespace-nowrap">
+                            {formatDate(tip.createdAt).replace(/\./g, '.')}
                           </td>
                         </tr>
                       )
@@ -286,6 +339,80 @@ export default function ContentTipsPage() {
             )}
           </CardContent>
         </Card>
+
+        {/* 모바일 카드 레이아웃 */}
+        <div className="md:hidden space-y-3">
+          {filteredTips.length === 0 ? (
+            <Card>
+              <CardContent>
+                <div className="text-center py-12 text-neutral-500">
+                  {searchQuery || selectedCategory !== 'all'
+                    ? '검색 결과가 없습니다'
+                    : '아직 등록된 콘텐츠 팁이 없습니다'}
+                </div>
+              </CardContent>
+            </Card>
+          ) : (
+            filteredTips.map((tip, index) => {
+              const category = CATEGORIES[tip.category]
+
+              return (
+                <Card
+                  key={tip.id}
+                  hover
+                  onClick={() => setSelectedTip(tip)}
+                  className="cursor-pointer"
+                >
+                  <CardContent className="p-4">
+                    {/* 상단: 카테고리 + 타입 */}
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="flex items-center gap-2">
+                        <span className="text-xl">{category?.icon}</span>
+                        <div>
+                          <div className="text-sm font-semibold text-neutral-900">
+                            {category?.name}
+                          </div>
+                          {tip.subCategory && (
+                            <div className="text-xs text-neutral-500 mt-0.5">
+                              {tip.subCategory}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                      <div>
+                        {tip.linkType === 'youtube' ? (
+                          <span className="inline-flex items-center gap-1 px-2 py-1 bg-red-50 text-red-700 text-xs font-medium rounded">
+                            📺 YT
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center gap-1 px-2 py-1 bg-blue-50 text-blue-700 text-xs font-medium rounded">
+                            🌐 Blog
+                          </span>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* 중간: 제목 */}
+                    <h3 className="font-bold text-neutral-900 mb-2 line-clamp-2">
+                      {tip.title}
+                    </h3>
+
+                    {/* 설명 */}
+                    <p className="text-sm text-neutral-600 line-clamp-2 mb-3">
+                      {tip.description}
+                    </p>
+
+                    {/* 하단: 날짜 + 작성자 */}
+                    <div className="flex items-center justify-between text-xs text-neutral-500 pt-3 border-t">
+                      <span>{tip.authorName}</span>
+                      <span>{formatDate(tip.createdAt)}</span>
+                    </div>
+                  </CardContent>
+                </Card>
+              )
+            })
+          )}
+        </div>
       </div>
 
       {/* 상세 모달 */}
