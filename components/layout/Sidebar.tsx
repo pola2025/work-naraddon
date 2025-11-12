@@ -8,6 +8,7 @@ import {
   HiOutlineClipboardList,
   HiOutlineKey,
   HiOutlineDocumentText,
+  HiOutlineLightBulb,
 } from 'react-icons/hi'
 
 const navigation = [
@@ -15,6 +16,7 @@ const navigation = [
   { name: '업무 관리', href: '/tasks', icon: HiOutlineClipboardList, adminOnly: false },
   { name: '운영 계정', href: '/accounts', icon: HiOutlineKey, adminOnly: true },
   { name: '블로그 포스팅', href: '/blog-posts', icon: HiOutlineDocumentText, adminOnly: false },
+  { name: '콘텐츠 제작 Tip', href: '/content-tips', icon: HiOutlineLightBulb, adminOnly: false },
 ]
 
 export function Sidebar() {

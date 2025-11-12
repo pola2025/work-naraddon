@@ -21,6 +21,23 @@ export function CreateTaskModal({ isOpen, onClose, onSuccess }: CreateTaskModalP
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
 
+  // 날짜 자동 포맷팅 함수 (20251112 -> 2025-11-12)
+  const formatDate = (input: string): string => {
+    // 숫자만 추출
+    const numbers = input.replace(/[^\d]/g, '')
+
+    // 8자리 숫자인 경우 (YYYYMMDD)
+    if (numbers.length === 8) {
+      const year = numbers.substring(0, 4)
+      const month = numbers.substring(4, 6)
+      const day = numbers.substring(6, 8)
+      return `${year}-${month}-${day}`
+    }
+
+    // 이미 포맷팅된 경우 또는 불완전한 입력은 그대로 반환
+    return input
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
@@ -96,8 +113,13 @@ export function CreateTaskModal({ isOpen, onClose, onSuccess }: CreateTaskModalP
           type="text"
           value={formData.dueDate}
           onChange={e => setFormData({ ...formData, dueDate: e.target.value })}
-          placeholder="YYYY-MM-DD"
-          helperText="예: 2025-12-31"
+          onBlur={e => {
+            // 포커스를 벗어날 때 자동 포맷팅
+            const formatted = formatDate(e.target.value)
+            setFormData({ ...formData, dueDate: formatted })
+          }}
+          placeholder="YYYYMMDD 또는 YYYY-MM-DD"
+          helperText="예: 20251231 또는 2025-12-31 (자동 변환됨)"
         />
 
         {error && (
