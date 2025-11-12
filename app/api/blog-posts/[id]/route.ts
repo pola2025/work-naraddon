@@ -74,7 +74,8 @@ export async function DELETE(req: NextRequest, { params }: { params: { id: strin
 
     // 작성자 또는 관리자만 삭제 가능
     const userId = session.user?.id || session.user?.email
-    if (post.author !== userId && session.user?.role !== 'admin') {
+    const isAdmin = session.user?.role === 'admin' || session.user?.role === 'master'
+    if (post.author !== userId && !isAdmin) {
       return NextResponse.json({ error: '삭제 권한이 없습니다' }, { status: 403 })
     }
 
