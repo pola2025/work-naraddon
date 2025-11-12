@@ -57,9 +57,12 @@ export function CreateTaskModal({ isOpen, onClose, onSuccess }: CreateTaskModalP
 
       if (!response.ok) {
         const data = await response.json()
+        console.log('❌ 에러 응답:', data)
         setError(data.error || '업무 생성 실패')
         return
       }
+
+      console.log('✅ 업무 생성 성공')
 
       // 성공
       setFormData({

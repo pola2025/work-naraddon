@@ -40,7 +40,11 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: '인증이 필요합니다' }, { status: 401 })
     }
 
-    const { title, description, category, url, attachments, dueDate } = await req.json()
+    const body = await req.json()
+    const { title, description, category, url, attachments, dueDate } = body
+
+    console.log('📥 서버에서 받은 데이터:', body)
+    console.log('📦 category 값:', category, typeof category)
 
     if (!title) {
       return NextResponse.json(
@@ -50,6 +54,7 @@ export async function POST(req: NextRequest) {
     }
 
     if (!category) {
+      console.log('❌ 카테고리 없음!')
       return NextResponse.json(
         { error: '카테고리는 필수입니다' },
         { status: 400 }
