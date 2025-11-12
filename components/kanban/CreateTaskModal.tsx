@@ -44,12 +44,16 @@ export function CreateTaskModal({ isOpen, onClose, onSuccess }: CreateTaskModalP
     setError('')
     setIsLoading(true)
 
+    console.log('📤 전송할 데이터:', formData)
+
     try {
       const response = await fetch('/api/tasks', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
       })
+
+      console.log('📥 응답 상태:', response.status)
 
       if (!response.ok) {
         const data = await response.json()
@@ -92,9 +96,11 @@ export function CreateTaskModal({ isOpen, onClose, onSuccess }: CreateTaskModalP
           </label>
           <select
             id="category"
+            name="category"
             value={formData.category}
+            defaultValue="기능개발"
             onChange={e => setFormData({ ...formData, category: e.target.value as any })}
-            className="w-full px-3 py-2 border border-neutral-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+            className="w-full px-3 py-2 border border-neutral-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary bg-white"
             required
           >
             <option value="기능개발">기능개발</option>
@@ -102,6 +108,7 @@ export function CreateTaskModal({ isOpen, onClose, onSuccess }: CreateTaskModalP
             <option value="마케팅">마케팅</option>
             <option value="기타">기타</option>
           </select>
+          <p className="text-xs text-neutral-500 mt-1">기본값: 기능개발</p>
         </div>
 
         <div>
