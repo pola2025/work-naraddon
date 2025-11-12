@@ -1,25 +1,24 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
-import clientPromise from '@/lib/mongodb'
+import { authOptions } from '@/app/auth-options'
+import dbConnect from '@/lib/mongodb'
+import UserModel from '@/lib/models/User'
 
 // GET: 모든 사용자 조회 (마스터 관리자만)
 export async function GET(request: NextRequest) {
   try {
-    const session = await getServerSession()
+    const session = await getServerSession(authOptions)
 
     // 마스터 관리자만 접근 가능
     if (!session || session.user.role !== 'master') {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 403 })
     }
 
-    const client = await clientPromise
-    const db = client.db()
+    await dbConnect()
 
-    const users = await db
-      .collection('users')
-      .find({})
+    const users = await UserModel.find({})
       .sort({ createdAt: -1 })
-      .toArray()
+      .lean()
 
     return NextResponse.json({
       success: true,
@@ -42,7 +41,7 @@ export async function GET(request: NextRequest) {
 // PATCH: 사용자 역할/승인 변경 (마스터 관리자만)
 export async function PATCH(request: NextRequest) {
   try {
-    const session = await getServerSession()
+    const session = await getServerSession(authOptions)
 
     // 마스터 관리자만 접근 가능
     if (!session || session.user.role !== 'master') {
@@ -55,8 +54,7 @@ export async function PATCH(request: NextRequest) {
       return NextResponse.json({ error: '사용자 ID가 필요합니다' }, { status: 400 })
     }
 
-    const client = await clientPromise
-    const db = client.db()
+    await dbConnect()
 
     const updateData: any = {
       updatedAt: new Date(),
@@ -64,7 +62,7 @@ export async function PATCH(request: NextRequest) {
 
     if (role !== undefined) {
       // 마스터 관리자 이메일 검증
-      const user = await db.collection('users').findOne({ _id: userId })
+      const user = await UserModel.findById(userId)
       if (role === 'master' && user?.email !== 'mkt@polarad.co.kr') {
         return NextResponse.json(
           { error: '마스터 관리자는 mkt@polarad.co.kr만 가능합니다' },
@@ -78,7 +76,7 @@ export async function PATCH(request: NextRequest) {
       updateData.isApproved = isApproved
     }
 
-    const result = await db.collection('users').updateOne({ _id: userId }, { $set: updateData })
+    const result = await UserModel.updateOne({ _id: userId }, { $set: updateData })
 
     if (result.matchedCount === 0) {
       return NextResponse.json({ error: '사용자를 찾을 수 없습니다' }, { status: 404 })
@@ -97,7 +95,7 @@ export async function PATCH(request: NextRequest) {
 // DELETE: 사용자 삭제 (마스터 관리자만)
 export async function DELETE(request: NextRequest) {
   try {
-    const session = await getServerSession()
+    const session = await getServerSession(authOptions)
 
     // 마스터 관리자만 접근 가능
     if (!session || session.user.role !== 'master') {
@@ -110,16 +108,15 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: '사용자 ID가 필요합니다' }, { status: 400 })
     }
 
-    const client = await clientPromise
-    const db = client.db()
+    await dbConnect()
 
     // 마스터 관리자는 삭제 불가
-    const user = await db.collection('users').findOne({ _id: userId })
+    const user = await UserModel.findById(userId)
     if (user?.role === 'master') {
       return NextResponse.json({ error: '마스터 관리자는 삭제할 수 없습니다' }, { status: 403 })
     }
 
-    const result = await db.collection('users').deleteOne({ _id: userId })
+    const result = await UserModel.deleteOne({ _id: userId })
 
     if (result.deletedCount === 0) {
       return NextResponse.json({ error: '사용자를 찾을 수 없습니다' }, { status: 404 })
