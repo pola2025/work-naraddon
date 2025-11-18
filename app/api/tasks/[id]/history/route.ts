@@ -4,6 +4,7 @@ import { authOptions } from '@/app/auth-options'
 import dbConnect from '@/lib/mongodb'
 import TaskHistoryModel from '@/lib/models/TaskHistory'
 import TaskModel from '@/lib/models/Task'
+import { sendTaskHistoryNotification } from '@/lib/telegram/notification'
 
 // 업무의 히스토리 목록 조회
 export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
@@ -88,6 +89,20 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
       attachments: attachments || [],
       author: session.user.id,
       authorName: session.user.name,
+    })
+
+    // 텔레그램 알림 전송 (비동기, 실패해도 히스토리 생성은 성공)
+    const taskUrl = `https://work.naraddon.com/tasks` // 또는 실제 배포 URL
+    sendTaskHistoryNotification({
+      taskNumber: task.number,
+      taskTitle: task.title,
+      historyStatus: history.status,
+      historyTitle: history.title,
+      historyContent: history.content,
+      authorName: session.user.name,
+      taskUrl,
+    }).catch((error) => {
+      console.error('Failed to send Telegram notification:', error)
     })
 
     return NextResponse.json({ history, message: '작업 이력이 추가되었습니다' }, { status: 201 })
