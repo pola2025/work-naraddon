@@ -208,7 +208,7 @@ export function KanbanBoard({ onTaskClick, onCreateTask, isAdmin }: KanbanBoardP
       ) : (
         <div className="bg-white rounded-lg border border-neutral-200 overflow-hidden">
           {/* 데스크톱 테이블 헤더 */}
-          <div className="hidden md:grid gap-4 px-6 py-3 bg-neutral-50 border-b border-neutral-200 font-medium text-sm text-neutral-700" style={{ gridTemplateColumns: '60px 100px 90px minmax(250px, 2fr) 110px 80px 80px 120px 60px 80px' }}>
+          <div className="hidden md:grid gap-4 px-6 py-3 bg-neutral-50 border-b border-neutral-200 font-medium text-sm text-neutral-700" style={{ gridTemplateColumns: '60px 100px 90px minmax(250px, 2fr) 110px 80px 80px 120px 80px' }}>
             <div className="text-center">번호</div>
             <div>날짜</div>
             <div>카테고리</div>
@@ -217,7 +217,6 @@ export function KanbanBoard({ onTaskClick, onCreateTask, isAdmin }: KanbanBoardP
             <div>예상마감</div>
             <div>완료일</div>
             <div>URL</div>
-            <div className="text-center">댓글</div>
             <div className="text-center">이력</div>
           </div>
 
@@ -228,7 +227,7 @@ export function KanbanBoard({ onTaskClick, onCreateTask, isAdmin }: KanbanBoardP
                 {/* 데스크톱 뷰 */}
                 <div
                   className="hidden md:grid gap-4 px-6 py-4 hover:bg-neutral-50 transition-colors cursor-pointer"
-                  style={{ gridTemplateColumns: '60px 100px 90px minmax(250px, 2fr) 110px 80px 80px 120px 60px 80px' }}
+                  style={{ gridTemplateColumns: '60px 100px 90px minmax(250px, 2fr) 110px 80px 80px 120px 80px' }}
                   onClick={() => onTaskClick(task)}
                 >
                 {/* 번호 */}
@@ -327,13 +326,6 @@ export function KanbanBoard({ onTaskClick, onCreateTask, isAdmin }: KanbanBoardP
                   ) : (
                     <span className="text-neutral-400">-</span>
                   )}
-                </div>
-
-                {/* 댓글 수 */}
-                <div className="flex items-center justify-center">
-                  <span className="text-sm text-neutral-600">
-                    {task.comments.length > 0 ? task.comments.length : '-'}
-                  </span>
                 </div>
 
                 {/* 히스토리 펼침/접기 */}
@@ -436,7 +428,7 @@ export function KanbanBoard({ onTaskClick, onCreateTask, isAdmin }: KanbanBoardP
                 {/* 하단 정보 (URL + 댓글 + 펼침 버튼) */}
                 <div className="flex items-center justify-between gap-3">
                   <div className="flex items-center gap-3 flex-1">
-                    {task.url ? (
+                    {task.url && (
                       <a
                         href={task.url}
                         target="_blank"
@@ -447,14 +439,6 @@ export function KanbanBoard({ onTaskClick, onCreateTask, isAdmin }: KanbanBoardP
                         <HiOutlineLink className="w-4 h-4 flex-shrink-0" />
                         <span className="truncate">링크</span>
                       </a>
-                    ) : (
-                      <div></div>
-                    )}
-                    {task.comments.length > 0 && (
-                      <div className="flex items-center gap-1.5 text-sm text-neutral-600 font-medium">
-                        <span className="text-base">💬</span>
-                        <span>{task.comments.length}</span>
-                      </div>
                     )}
                   </div>
                   <button
