@@ -19,7 +19,8 @@ export interface Task {
   status: 'preparing' | 'in_progress' | 'completed'
   url?: string
   attachments?: Attachment[]
-  dueDate?: Date
+  expectedDueDate?: Date // 예상마감일
+  completedAt?: Date // 완료일 (자동 기록)
   comments: Comment[]
   createdAt: Date
   updatedAt: Date
@@ -41,6 +42,20 @@ export interface Comment {
   author: string // user _id
   content: string
   createdAt: Date
+}
+
+// 업무 히스토리 (작업 이력)
+export interface TaskHistory {
+  _id: string
+  taskId: string // 연결된 업무 ID
+  status: 'making' | 'confirming' | 'in_progress' | 'completed' | 'on_hold' | 'cancelled'
+  title: string // 히스토리 제목 (필수)
+  content?: string // 상세 내용 (선택)
+  attachments?: Attachment[] // 첨부파일
+  author: string // 작성자 ID (user._id)
+  authorName: string // 작성자 이름 (스냅샷)
+  createdAt: Date
+  updatedAt: Date
 }
 
 // 운영 계정
