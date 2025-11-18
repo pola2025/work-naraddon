@@ -18,12 +18,10 @@ interface TaskDetailModalProps {
   isAdmin: boolean
 }
 
-type TabType = 'info' | 'history' | 'comments'
+type TabType = 'info' | 'history'
 
 export function TaskDetailModal({ isOpen, onClose, task, onUpdate, isAdmin }: TaskDetailModalProps) {
-  const [activeTab, setActiveTab] = useState<TabType>('info')
-  const [comment, setComment] = useState('')
-  const [isAddingComment, setIsAddingComment] = useState(false)
+  const [activeTab, setActiveTab] = useState<TabType>('history')
   const [isDeleting, setIsDeleting] = useState(false)
   const [isEditing, setIsEditing] = useState(false)
   const [editForm, setEditForm] = useState({
@@ -91,28 +89,6 @@ export function TaskDetailModal({ isOpen, onClose, task, onUpdate, isAdmin }: Ta
     preparing: '준비중',
     in_progress: '진행중',
     completed: '진행완료',
-  }
-
-  const handleAddComment = async () => {
-    if (!comment.trim()) return
-
-    setIsAddingComment(true)
-    try {
-      const response = await fetch(`/api/tasks/${task._id}/comments`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ content: comment }),
-      })
-
-      if (response.ok) {
-        setComment('')
-        onUpdate()
-      }
-    } catch (error) {
-      console.error('Failed to add comment:', error)
-    } finally {
-      setIsAddingComment(false)
-    }
   }
 
   const handleDelete = async () => {
@@ -348,16 +324,6 @@ export function TaskDetailModal({ isOpen, onClose, task, onUpdate, isAdmin }: Ta
               >
                 작업이력
               </button>
-              <button
-                onClick={() => setActiveTab('comments')}
-                className={`px-4 py-2.5 text-sm font-medium transition-colors border-b-2 ${
-                  activeTab === 'comments'
-                    ? 'text-blue-600 border-blue-600'
-                    : 'text-neutral-600 border-transparent hover:text-neutral-900'
-                }`}
-              >
-                댓글 ({task.comments.length})
-              </button>
             </div>
 
             {/* 탭 콘텐츠 */}
@@ -416,45 +382,6 @@ export function TaskDetailModal({ isOpen, onClose, task, onUpdate, isAdmin }: Ta
                 </div>
               )}
 
-              {/* 댓글 탭 */}
-              {activeTab === 'comments' && (
-                <div>
-                  {/* 댓글 목록 */}
-                  <div className="space-y-3 mb-4">
-                    {task.comments.map((comment, index) => (
-                      <div key={index} className="bg-neutral-50 rounded-lg p-3">
-                        <div className="flex items-center gap-2 mb-2">
-                          <span className="font-medium text-sm text-neutral-900">{comment.author}</span>
-                          <span className="text-xs text-neutral-500">
-                            {format(new Date(comment.createdAt), 'yyyy-MM-dd HH:mm')}
-                          </span>
-                        </div>
-                        <p className="text-neutral-700 text-sm">{comment.content}</p>
-                      </div>
-                    ))}
-
-                    {task.comments.length === 0 && (
-                      <p className="text-neutral-500 text-sm text-center py-8">댓글이 없습니다</p>
-                    )}
-                  </div>
-
-                  {/* 댓글 작성 */}
-                  <div className="space-y-2">
-                    <textarea
-                      value={comment}
-                      onChange={e => setComment(e.target.value)}
-                      placeholder="댓글을 입력하세요..."
-                      rows={3}
-                      className="w-full px-3 py-2 border border-neutral-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
-                    />
-                    <div className="flex justify-end">
-                      <Button onClick={handleAddComment} disabled={isAddingComment || !comment.trim()}>
-                        {isAddingComment ? '추가 중...' : '댓글 추가'}
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              )}
             </div>
 
             {/* 하단 버튼 */}
