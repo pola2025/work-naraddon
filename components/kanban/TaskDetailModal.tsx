@@ -1,12 +1,14 @@
 'use client'
 
 import { useState } from 'react'
-import { Task } from '@/types'
+import { Task, TaskHistory } from '@/types'
 import { Modal } from '@/components/ui/Modal'
 import { Button } from '@/components/ui/Button'
 import { format } from 'date-fns'
 import { HiOutlineClock, HiOutlineLink, HiOutlineTrash, HiOutlinePaperClip, HiOutlinePencil } from 'react-icons/hi'
 import { Input } from '@/components/ui/Input'
+import { HistoryList } from '@/components/task-history/HistoryList'
+import { HistoryForm } from '@/components/task-history/HistoryForm'
 
 interface TaskDetailModalProps {
   isOpen: boolean
@@ -16,7 +18,10 @@ interface TaskDetailModalProps {
   isAdmin: boolean
 }
 
+type TabType = 'info' | 'history' | 'comments'
+
 export function TaskDetailModal({ isOpen, onClose, task, onUpdate, isAdmin }: TaskDetailModalProps) {
+  const [activeTab, setActiveTab] = useState<TabType>('info')
   const [comment, setComment] = useState('')
   const [isAddingComment, setIsAddingComment] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
@@ -30,6 +35,9 @@ export function TaskDetailModal({ isOpen, onClose, task, onUpdate, isAdmin }: Ta
     dueDate: '',
   })
   const [isUpdating, setIsUpdating] = useState(false)
+  const [showHistoryForm, setShowHistoryForm] = useState(false)
+  const [editingHistory, setEditingHistory] = useState<TaskHistory | null>(null)
+  const [historyRefreshTrigger, setHistoryRefreshTrigger] = useState(0)
 
   if (!task) return null
 
@@ -125,6 +133,24 @@ export function TaskDetailModal({ isOpen, onClose, task, onUpdate, isAdmin }: Ta
     } finally {
       setIsDeleting(false)
     }
+  }
+
+  // 히스토리 추가/수정 성공 핸들러
+  const handleHistorySuccess = () => {
+    setShowHistoryForm(false)
+    setEditingHistory(null)
+    setHistoryRefreshTrigger(prev => prev + 1)
+  }
+
+  // 히스토리 수정 시작
+  const handleEditHistory = (history: TaskHistory) => {
+    setEditingHistory(history)
+    setShowHistoryForm(true)
+  }
+
+  // 히스토리 삭제 핸들러
+  const handleDeleteHistory = () => {
+    setHistoryRefreshTrigger(prev => prev + 1)
   }
 
   return (
@@ -297,46 +323,138 @@ export function TaskDetailModal({ isOpen, onClose, task, onUpdate, isAdmin }: Ta
           </>
         )}
 
-        {/* 댓글 - 수정 모드가 아닐 때만 표시 */}
+        {/* 탭 + 콘텐츠 - 수정 모드가 아닐 때만 표시 */}
         {!isEditing && (
           <>
-            <div>
-              <h3 className="font-semibold text-neutral-900 mb-4">댓글 ({task.comments.length})</h3>
+            {/* 탭 네비게이션 */}
+            <div className="flex gap-1 border-b border-neutral-200 -mx-6 px-6">
+              <button
+                onClick={() => setActiveTab('info')}
+                className={`px-4 py-2.5 text-sm font-medium transition-colors border-b-2 ${
+                  activeTab === 'info'
+                    ? 'text-blue-600 border-blue-600'
+                    : 'text-neutral-600 border-transparent hover:text-neutral-900'
+                }`}
+              >
+                업무정보
+              </button>
+              <button
+                onClick={() => setActiveTab('history')}
+                className={`px-4 py-2.5 text-sm font-medium transition-colors border-b-2 ${
+                  activeTab === 'history'
+                    ? 'text-blue-600 border-blue-600'
+                    : 'text-neutral-600 border-transparent hover:text-neutral-900'
+                }`}
+              >
+                작업이력
+              </button>
+              <button
+                onClick={() => setActiveTab('comments')}
+                className={`px-4 py-2.5 text-sm font-medium transition-colors border-b-2 ${
+                  activeTab === 'comments'
+                    ? 'text-blue-600 border-blue-600'
+                    : 'text-neutral-600 border-transparent hover:text-neutral-900'
+                }`}
+              >
+                댓글 ({task.comments.length})
+              </button>
+            </div>
 
-              {/* 댓글 목록 */}
-              <div className="space-y-3 mb-4">
-                {task.comments.map((comment, index) => (
-                  <div key={index} className="bg-neutral-50 rounded-lg p-3">
-                    <div className="flex items-center gap-2 mb-2">
-                      <span className="font-medium text-sm text-neutral-900">{comment.author}</span>
-                      <span className="text-xs text-neutral-500">
-                        {format(new Date(comment.createdAt), 'yyyy-MM-dd HH:mm')}
-                      </span>
+            {/* 탭 콘텐츠 */}
+            <div className="min-h-[300px]">
+              {/* 업무정보 탭 */}
+              {activeTab === 'info' && (
+                <div>
+                  {/* 설명 */}
+                  {task.description && (
+                    <div>
+                      <h3 className="font-semibold text-neutral-900 mb-2">설명</h3>
+                      <p className="text-neutral-700 whitespace-pre-wrap">{task.description}</p>
                     </div>
-                    <p className="text-neutral-700 text-sm">{comment.content}</p>
-                  </div>
-                ))}
+                  )}
 
-                {task.comments.length === 0 && (
-                  <p className="text-neutral-500 text-sm text-center py-4">댓글이 없습니다</p>
-                )}
-              </div>
-
-              {/* 댓글 작성 */}
-              <div className="space-y-2">
-                <textarea
-                  value={comment}
-                  onChange={e => setComment(e.target.value)}
-                  placeholder="댓글을 입력하세요..."
-                  rows={3}
-                  className="w-full px-3 py-2 border border-neutral-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
-                />
-                <div className="flex justify-end">
-                  <Button onClick={handleAddComment} disabled={isAddingComment || !comment.trim()}>
-                    {isAddingComment ? '추가 중...' : '댓글 추가'}
-                  </Button>
+                  {!task.description && (
+                    <p className="text-neutral-500 text-sm text-center py-12">업무 설명이 없습니다</p>
+                  )}
                 </div>
-              </div>
+              )}
+
+              {/* 작업이력 탭 */}
+              {activeTab === 'history' && (
+                <div className="space-y-4">
+                  {/* 히스토리 추가 버튼 */}
+                  {isAdmin && !showHistoryForm && (
+                    <div className="flex justify-end">
+                      <Button onClick={() => setShowHistoryForm(true)} size="sm">
+                        + 새 이력 추가
+                      </Button>
+                    </div>
+                  )}
+
+                  {/* 히스토리 폼 */}
+                  {showHistoryForm && isAdmin && (
+                    <HistoryForm
+                      taskId={task._id}
+                      editingHistory={editingHistory}
+                      onSuccess={handleHistorySuccess}
+                      onCancel={() => {
+                        setShowHistoryForm(false)
+                        setEditingHistory(null)
+                      }}
+                    />
+                  )}
+
+                  {/* 히스토리 목록 */}
+                  <HistoryList
+                    taskId={task._id}
+                    isCompact={false}
+                    isAdmin={isAdmin}
+                    onEdit={handleEditHistory}
+                    onDelete={handleDeleteHistory}
+                    refreshTrigger={historyRefreshTrigger}
+                  />
+                </div>
+              )}
+
+              {/* 댓글 탭 */}
+              {activeTab === 'comments' && (
+                <div>
+                  {/* 댓글 목록 */}
+                  <div className="space-y-3 mb-4">
+                    {task.comments.map((comment, index) => (
+                      <div key={index} className="bg-neutral-50 rounded-lg p-3">
+                        <div className="flex items-center gap-2 mb-2">
+                          <span className="font-medium text-sm text-neutral-900">{comment.author}</span>
+                          <span className="text-xs text-neutral-500">
+                            {format(new Date(comment.createdAt), 'yyyy-MM-dd HH:mm')}
+                          </span>
+                        </div>
+                        <p className="text-neutral-700 text-sm">{comment.content}</p>
+                      </div>
+                    ))}
+
+                    {task.comments.length === 0 && (
+                      <p className="text-neutral-500 text-sm text-center py-8">댓글이 없습니다</p>
+                    )}
+                  </div>
+
+                  {/* 댓글 작성 */}
+                  <div className="space-y-2">
+                    <textarea
+                      value={comment}
+                      onChange={e => setComment(e.target.value)}
+                      placeholder="댓글을 입력하세요..."
+                      rows={3}
+                      className="w-full px-3 py-2 border border-neutral-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+                    />
+                    <div className="flex justify-end">
+                      <Button onClick={handleAddComment} disabled={isAddingComment || !comment.trim()}>
+                        {isAddingComment ? '추가 중...' : '댓글 추가'}
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* 하단 버튼 */}
